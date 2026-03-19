@@ -1,45 +1,16 @@
-const apikey ="AIzaSyCigcMZxLTfNIPwfpARIpzkkzmtH_OwK6o"
+import { GoogleGenAI } from "@google/genai";
 
-import  GoogleGenAI  from "@google/genai";
+const apiKey = "AIzaSyB9qLHwkxmuHb9v7SnZ-85b6ZpPhFzj5Yc";
 
-async function generate() {
-  const ai = new GoogleGenAI({
-    apiKey: "AIzaSyCigcMZxLTfNIPwfpARIpzkkzmtH_OwK6o ",
+const ai = new GoogleGenAI({ apiKey });
+
+async function Gemini(prompt) {
+  const response = await ai.models.generateContent({
+    model: "gemini-2.0-flash",
+    contents: prompt,
   });
 
-  const model = "gemini-3-flash-preview";
-
-  const contents = [
-    {
-      role: "user",
-      parts: [
-        { text: "INSERT_INPUT_HERE" }
-      ],
-    },
-  ];
-
-  const config = {
-    thinkingConfig: {
-      thinkingLevel: "HIGH",
-    },
-    tools: [
-      {
-        googleSearch: {},
-      },
-    ],
-  };
-
-  const response = await ai.models.generateContentStream({
-    model,
-    contents,
-    config,
-  });
-
-  for await (const chunk of response) {
-    process.stdout.write(chunk.text || "");
-  }
+  return response.text;
 }
-
-generate().catch(console.error);
 
 export default Gemini;
