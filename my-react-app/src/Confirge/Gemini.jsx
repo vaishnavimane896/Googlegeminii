@@ -1,13 +1,14 @@
+const VITE_OPENROUTER_KEY="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";
 async function Gemini(prompt) {
   try {
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${import.meta.env.VITE_OPENROUTER_KEY}`,
+        "Authorization": `Bearer ${VITE_OPENROUTER_KEY}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "openrouter/free",  // ✅ changed this line only
+        model: "openrouter/free",  
         messages: [{ role: "user", content: prompt }]
       })
     });
