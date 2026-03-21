@@ -4,11 +4,19 @@ import { Asset } from "../../assets/Asset";
 import { Context } from "../../context/Context";
 
 const Main = () => {
-  const { input, setInput, onSent, showResult, loading, resultData, recentPrompt } =
+  const { input, setInput, onSent, showResult, loading, resultData, recentPrompt, newChat } =
     useContext(Context);
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter" && input.trim()) {
+    // ✅ Prevent firing while loading
+    if (e.key === "Enter" && input.trim() && !loading) {
+      onSent(input);
+    }
+  };
+
+  const handleSend = () => {
+    // ✅ Prevent firing while loading
+    if (input.trim() && !loading) {
       onSent(input);
     }
   };
@@ -16,47 +24,49 @@ const Main = () => {
   return (
     <div className="main">
       <div className="nav">
-        <p>Gemini</p>
-        <img src={Asset.user} alt="" />
+        {/* ✅ Clicking title resets to home */}
+        <p onClick={newChat} className="nav-title">Gemini</p>
+        <div className="nav-right">
+          <span className="nav-badge">AI</span>
+          <img src={Asset.user} alt="User" className="nav-avatar" />
+        </div>
       </div>
 
       <div className="main-container">
         {!showResult ? (
           <>
             <div className="greet">
-              <p>
-                <span>Hello, Vaishnavi</span>
-              </p>
+              <p><span>Hello, Vaishnavi 👋</span></p>
               <p>How can I help you today?</p>
             </div>
 
             <div className="cards">
-              <div className="card" onClick={() => onSent("Suggest beautiful places to visit on road trip")}>
+              <div className="card" onClick={() => onSent("Suggest beautiful places to visit on a road trip")}>
                 <p>Suggest beautiful places to visit on a road trip</p>
-                <img src={Asset.compass} alt="" />
+                <img src={Asset.compass} alt="Compass" />
               </div>
               <div className="card" onClick={() => onSent("Briefly summarize this concept: urban planning")}>
                 <p>Briefly summarize this concept: urban planning</p>
-                <img src={Asset.bulb} alt="" />
+                <img src={Asset.bulb} alt="Bulb" />
               </div>
               <div className="card" onClick={() => onSent("Brainstorm team bonding activities for our work retreat")}>
                 <p>Brainstorm team bonding activities for our work retreat</p>
-                <img src={Asset.message} alt="" />
+                <img src={Asset.message} alt="Message" />
               </div>
               <div className="card" onClick={() => onSent("Improve the readability of the following code")}>
                 <p>Improve the readability of the following code</p>
-                <img src={Asset.code} alt="" />
+                <img src={Asset.code} alt="Code" />
               </div>
             </div>
           </>
         ) : (
           <div className="result">
             <div className="result-title">
-              <img src={Asset.user} alt="" />
+              <img src={Asset.user} alt="User" />
               <p>{recentPrompt}</p>
             </div>
             <div className="result-data">
-              <img src={Asset.gemini_icon} alt="" />
+              <img src='' alt="Gemini" />
               {loading ? (
                 <div className="loader">
                   <hr />
@@ -64,9 +74,15 @@ const Main = () => {
                   <hr />
                 </div>
               ) : (
-                <p dangerouslySetInnerHTML={{ __html: resultData }}></p>
+                /* ✅ resultData is now pre-formatted HTML from Context */
+                <div className="result-content" dangerouslySetInnerHTML={{ __html: resultData }} />
               )}
             </div>
+
+            {/* ✅ New chat button inside result view */}
+            <button className="new-chat-btn" onClick={newChat}>
+              + New Chat
+            </button>
           </div>
         )}
 
@@ -74,27 +90,28 @@ const Main = () => {
           <div className="search-box">
             <input
               type="text"
-              placeholder="Enter a prompt here"
+              placeholder="Ask Gemini anything..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
+              disabled={loading} 
             />
-            <div>
-              <img src={Asset.Gallary} alt="" />
-              <img src={Asset.mic} alt="" />
-              {input.trim() && (
+            <div className="search-icons">
+              <img src={Asset.Gallary} alt="Gallery" title="Attach image" />
+              <img src={Asset.mic} alt="Mic" title="Voice input" />
+              {input.trim() && !loading && (
                 <img
                   src={Asset.send}
                   alt="Send"
-                  onClick={() => onSent(input)}
-                  style={{ cursor: "pointer" }}
+                  onClick={handleSend}
+                  className="send-btn"
                 />
               )}
             </div>
           </div>
           <p className="bottom-info">
             Gemini may display inaccurate info, including about people, so
-            double-check its responses.
+            double-check its responses. Your privacy is protected.
           </p>
         </div>
       </div>
